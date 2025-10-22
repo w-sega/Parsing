@@ -49,6 +49,16 @@ Parsing 是一个 Chrome 插件，用于解析当前页面的 JavaScript 代码�
     <img src="png/fbq.png" alt="发包器" width="80%">
 </div>
 
+### 子域名收集
+<div style="text-align:center">
+    <img src="png/aijl.png" alt="子域名收集" width="80%">
+</div>
+
+### 快捷功能
+<div style="text-align:center">
+    <img src="png/aijl.png" alt="快捷功能" width="80%">
+</div>
+
 ### 设置
 <div style="text-align:center">
     <img src="png/sz.png" alt="设置" width="80%">
