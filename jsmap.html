@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JSMap Inspector</title>
+  
+  <link rel="stylesheet" href="/css/monokai-sublime.min.css">
+  <link rel="stylesheet" href="/css/jsmap.css">
+</head>
+<body>
+  <header>
+    <input type="file" id="fileInput" accept=".map">
+    <input type="text" id="searchInput" placeholder="Search...">
+  </header>
+
+  <main>
+    <div id="treeView"></div>
+
+    <div id="content-container">
+      <div id="preview"><i>Source content will be displayed here</i></div>
+      
+      <div id="ai-panel">
+        <div class="ai-header">AI 辅助分析</div>
+        <div id="ai-controls">
+            <p>请选择要对上方预览代码进行的分析类型：</p>
+            <div id="ai-buttons-container">
+                <button data-type="all_apis">分析所有接口及参数</button>
+                <button data-type="encryption">分析加密逻辑</button>
+                <button data-type="xss">分析XSS风险</button>
+                <button data-type="permissions">分析页面权限</button>
+            </div>
+            <div id="custom-ai-query-container">
+                <textarea id="custom-ai-input" placeholder="或在此输入您的自定义问题..."></textarea>
+                <button id="send-custom-ai-btn">发送给AI分析</button>
+            </div>
+        </div>
+        <div id="ai-result-container" style="display: none;">
+            <div class="ai-result-header">
+                <h4>AI 分析结果:</h4>
+                <button id="copy-ai-result-btn">复制结果</button>
+            </div>
+            <pre id="ai-result"></pre>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    Powered by mitsec — <a href="https://x.com/ynsmroztas" target="_blank" style="color: #888;">x.com/ynsmroztas</a>
+  </footer>
+
+  <script src="/js/highlight.min.js"></script>
+  <script src="/js/jsmap.js"></script>
+</body>
+</html>

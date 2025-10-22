@@ -1,0 +1,272 @@
+/* jsmap.css (优化后的核心样式) */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #1a1a1a; /* 统一深色背景 */
+  color: #c9d1d9; /* 默认文本颜色 */
+}
+
+header {
+  display: flex;
+  padding: 10px 15px;
+  background-color: #222222;
+  border-bottom: 1px solid #333333;
+  gap: 10px;
+}
+
+header input[type="file"],
+header input[type="text"] {
+  background-color: #333333;
+  border: 1px solid #555555;
+  color: #c9d1d9;
+  padding: 8px 10px;
+  border-radius: 4px;
+}
+
+header input[type="text"] {
+  flex-grow: 1;
+}
+
+main {
+  display: flex;
+  flex: 1;
+  overflow: hidden; /* 防止主区域出现不必要的滚动条 */
+}
+
+#treeView {
+  width: 280px;
+  min-width: 200px; /* 防止过小 */
+  max-width: 400px; /* 防止过大 */
+  border-right: 1px solid #333333;
+  overflow-y: auto;
+  padding: 10px 0;
+  background-color: #1e1e1e;
+}
+
+#treeView ul {
+  list-style: none;
+  padding-left: 15px;
+  margin: 0;
+}
+
+#treeView li {
+  margin: 2px 0;
+}
+
+#treeView span {
+  cursor: pointer;
+  padding: 5px 10px;
+  display: block;
+  user-select: none;
+}
+
+#treeView span:hover {
+  background-color: #2a2a2a;
+}
+
+#treeView .folder {
+  font-weight: bold;
+  color: #8be9fd; /* Monokai blue */
+}
+
+#treeView .file {
+  color: #f8f8f2; /* Monokai foreground */
+}
+
+#treeView ul.hidden {
+  display: none;
+}
+
+
+/* --- 【核心修改】AI 面板和内容容器的样式 --- */
+#content-container {
+  flex: 1; /* 占据剩余所有空间 */
+  display: flex;
+  flex-direction: column; /* 垂直布局 */
+  overflow: hidden; /* 防止出现双重滚动条 */
+  background-color: #282a36; /* 代码背景色，与代码高亮主题融合 */
+}
+
+#preview {
+  flex: 1; /* 预览区占据大部分空间，允许自身滚动 */
+  overflow-y: auto; /* 关键：让代码预览区独立滚动 */
+  padding: 15px; /* 增加内边距 */
+  min-height: 200px; /* 保证预览区有最小高度 */
+  border-bottom: 1px solid #333333; /* 分隔线 */
+}
+
+#preview i {
+  color: #999;
+}
+
+#preview pre {
+    margin: 0; /* 移除pre的默认margin */
+    background-color: transparent; /* 让pre背景透明，使用 #content-container 的背景色 */
+    padding: 0;
+}
+
+
+#ai-panel {
+  flex-shrink: 0; /* 防止AI面板被过度压缩 */
+  height: 40%; /* 默认高度，可通过用户拖拽调整 */
+  min-height: 100px; /* 最小高度 */
+  max-height: 80%; /* 最大高度 */
+  display: flex;
+  flex-direction: column;
+  background-color: #1e1e1e; /* AI面板独立背景色 */
+  border-top: 1px solid #333333; /* 分隔线 */
+}
+
+.ai-header {
+  background-color: #222222; /* 标题背景色 */
+  color: #50fa7b; /* 龙猫绿，或您喜欢的强调色 */
+  padding: 10px 15px;
+  font-weight: bold;
+  border-bottom: 1px solid #333333;
+  cursor: grab; /* 提示可拖拽 */
+  user-select: none;
+}
+
+#ai-controls {
+  padding: 15px; /* 增加内边距 */
+  border-bottom: 1px solid #2a2a2a; /* 控制区与结果区的分隔 */
+}
+
+#ai-controls p {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  color: #999;
+}
+
+#ai-buttons-container {
+  display: flex;
+  flex-wrap: wrap; /* 按钮过多时自动换行 */
+  gap: 8px; /* 按钮间距 */
+  margin-bottom: 10px;
+}
+
+#ai-buttons-container button,
+#send-custom-ai-btn {
+  background-color: #444444;
+  color: #f8f8f2;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap; /* 防止按钮文本换行 */
+}
+
+#ai-buttons-container button:hover,
+#send-custom-ai-btn:hover {
+  background-color: #555555;
+}
+
+#custom-ai-query-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: flex-end; /* 使按钮和文本框底部对齐 */
+}
+
+#custom-ai-input {
+  flex-grow: 1;
+  min-height: 40px; /* 最小高度 */
+  height: auto; /* 允许根据内容自动调整高度 */
+  background-color: #333333;
+  color: #c9d1d9;
+  border: 1px solid #555555;
+  border-radius: 4px;
+  padding: 8px;
+  resize: vertical; /* 允许用户垂直拖拽改变大小 */
+  font-family: monospace;
+  font-size: 14px;
+}
+
+#send-custom-ai-btn {
+    padding: 8px 15px; /* 增加按钮尺寸 */
+}
+
+#ai-result-container {
+  flex: 1; /* 结果区占据剩余空间，允许自身滚动 */
+  overflow-y: auto; /* 关键：让AI结果区独立滚动 */
+  padding: 15px;
+  background-color: #1e1e1e; /* 确保背景色一致 */
+}
+
+.ai-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ai-result-header h4 {
+  margin: 0;
+  color: #50fa7b; /* 强调色 */
+}
+
+#copy-ai-result-btn {
+  background-color: #6272a4; /* 紫色调，与 Monokai 搭配 */
+  color: #f8f8f2;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#copy-ai-result-btn:hover {
+  background-color: #7886b7;
+}
+
+#ai-result {
+  background-color: #282a36; /* 与代码预览区保持一致，或深一点 */
+  color: #f8f8f2;
+  padding: 10px;
+  white-space: pre-wrap; /* 保留空白和换行 */
+  word-wrap: break-word; /* 避免长单词溢出 */
+  border: 1px solid #333333;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+
+footer {
+  padding: 8px 15px;
+  background-color: #222222;
+  border-top: 1px solid #333333;
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+}
+
+footer a {
+  color: #888;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* highlight.js monokai-sublime.min.css 的路径也请确保正确 */
+/* 例如，如果放在与 jsmap.html 同级目录，就直接写 monokai-sublime.min.css */
+
+#resizer {
+  height: 8px; /* 分隔条的高度 */
+  background-color: #3d3d3d; /* 分隔条的颜色 */
+  cursor: ns-resize; /* 鼠标悬停时显示上下调整的图标 */
+  flex-shrink: 0; /* 防止被压缩 */
+  position: relative;
+  z-index: 10; /* 确保在其他元素之上 */
+}
+
+#resizer:hover {
+  background-color: #555555; /* 悬停时颜色变深 */
+}

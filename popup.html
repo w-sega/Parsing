@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Parsing</title>
+    <style>
+    :root {
+        --font-apple: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --bg-main: #ffffff;
+        --bg-subtle: #f5f5f7;
+        --border-color: rgba(0, 0, 0, 0.16);
+        --text-primary: #1d1d1f;
+        --text-secondary: #6e6e73;
+        --accent-blue: #0071e3;
+        --accent-blue-hover: #0077ed;
+    }
+
+    body { 
+        font-family: var(--font-apple);
+        font-size: 14px; 
+        width: 700px; 
+        max-height: 950px; 
+        padding: 0; 
+        margin: 0; 
+        display: flex; 
+        flex-direction: column; 
+        background-color: var(--bg-subtle);
+        color: var(--text-secondary);
+        -webkit-font-smoothing: antialiased;
+    }
+    .nav { 
+        display: flex; 
+        flex-shrink: 0; 
+        background-color: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-color);
+    }
+    .nav button { 
+        background: none; 
+        border: none; 
+        padding: 10px 15px; 
+        cursor: pointer; 
+        font-size: 14px; 
+        color: var(--text-secondary);
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+    .nav button:hover {
+        color: var(--text-primary);
+    }
+    .nav button.active { 
+        background-color: transparent;
+        color: var(--text-primary);
+    }
+    .view { 
+        display: none; 
+        padding: 10px; 
+        flex-grow: 1; 
+        overflow-y: auto; 
+        min-height: 450px;
+    }
+    .view.active { 
+        display: block; 
+    }
+
+    .request-item, .history-item { 
+        border: 1px solid transparent;
+        padding: 10px; 
+        margin-bottom: 10px; 
+        border-radius: 12px;
+        background-color: var(--bg-main);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .url { 
+        font-weight: 600; 
+        word-break: break-all; 
+        margin-bottom: 5px; 
+        color: var(--text-primary);
+    }
+    .initiator, .history-meta { 
+        font-size: 12px; 
+        word-break: break-all; 
+        margin-bottom: 10px; 
+        color: var(--text-secondary);
+    }
+    pre { 
+        padding: 8px; 
+        white-space: pre-wrap; 
+        word-break: break-all; 
+        border-radius: 3px; 
+        font-size: 13px; 
+        background-color: #fafafa;
+        border: 1px solid #eee;
+        color: var(--text-primary);
+    }
+    #ignore-list-textarea { 
+        width: 98%; 
+        height: 200px; 
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+    }
+
+    .sender-item {
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        background-color: var(--bg-main);
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .sender-item .sender-grid {
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        gap: 10px;
+        align-items: center;
+    }
+    .sender-item .sender-grid textarea {
+        grid-column: 1 / -1;
+        height: 200px;
+        width: 98%;
+    }
+    .sender-item .sender-response-pre {
+        min-height: 50px;
+        background-color: var(--bg-subtle);
+        border: 1px solid var(--border-color);
+    }
+
+    .history-item details {
+        margin-top: 10px;
+    }
+    .history-item pre {
+        max-height: 200px;
+        overflow-y: auto;
+        margin-top: 5px;
+        padding: 8px;
+        background-color: var(--bg-subtle);
+        border: 1px solid var(--border-color);
+    }
+    .history-copy-btn {
+        margin-left: 8px;
+    }
+    
+    button {
+        background-color: var(--accent-blue);
+        color: white;
+        border: none;
+        border-radius: 9999px; 
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    button:hover {
+        background-color: var(--accent-blue-hover);
+    }
+
+    .modal { 
+        display: none; position: fixed; z-index: 1000; left: 0; top: 0; 
+        width: 100%; height: 100%; overflow: auto; 
+        background-color: rgba(255,255,255,0.6);
+        backdrop-filter: blur(10px);
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 0;
+        padding: 20px;
+        border: none;
+        width: 100%;
+        height: 200%;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+    .modal-header { 
+        padding-bottom: 10px; 
+        border-bottom: 1px solid var(--border-color);
+    }
+    .modal-body { 
+        flex-grow: 1; 
+        overflow-y: auto; 
+        margin-top: 10px;
+        display: block;
+    }
+    .close-btn { 
+        color: #888; 
+        float: right; 
+        font-size: 28px; 
+        font-weight: bold; 
+        cursor: pointer; 
+    }
+    .highlight { 
+        background-color: transparent;
+        color: var(--accent-blue);
+        font-weight: 600;
+    }
+    .ai-buttons button { 
+
+    background-color: var(--accent-blue); 
+    color: white;                      
+    border: none;                     
+    padding: 6px 14px;                 
+    margin: 0 8px 8px 0;              
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+    #ai-result-header, #ai-result-container {
+        margin-top: 15px;
+    }
+    #ai-result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    #ai-result-header h4 { margin: 0; }
+    .header-buttons button { margin-left: 8px; }
+    .scan-result-details {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    overflow: hidden; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.scan-result-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 7px;
+    font-weight: 300; 
+    cursor: pointer;
+    background-color: #fdfdfd;
+    transition: background-color 0.2s ease;
+    list-style: none; 
+}
+
+.scan-result-summary:hover {
+    background-color: var(--bg-subtle);
+}
+
+.scan-result-summary::-webkit-details-marker {
+    display: none; 
+}
+
+.summary-title {
+    color: var(--text-primary);
+}
+
+.summary-count {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background-color: var(--bg-subtle);
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+}
+#view-scanner {
+    background-color: #f7f7f7; 
+}
+
+.scan-category-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    margin-bottom: 1px; 
+    border: 1px solid #e8e8e8;
+}
+
+.scan-card-header {
+    cursor: pointer;
+    outline: none;
+    padding: 0; 
+}
+
+.scan-card-header::-webkit-details-marker { display: none; }
+.scan-card-header { list-style: none; }
+
+.summary-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 97%;
+    padding: 0.01px 0.01px; 
+}
+
+.summary-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+}
+
+.summary-arrow {
+    width: 3px;
+    height: 3px;
+    border-style: solid;
+    border-color: #888;
+    border-width: 0 1px 1px 0; 
+    display: inline-block;
+    padding: 1px;
+    transform: rotate(45deg); 
+    transition: transform 0.2s ease-in-out;
+}
+
+details:not([open]) > .scan-card-header .summary-arrow {
+    transform: rotate(-45deg)
+}
+
+.scan-card-title {
+    padding-left: 0; 
+}
+
+details[open] > .scan-card-content {
+    background-color: #fafafa;
+}
+
+
+.scan-card-title span {
+    color: #888;
+    font-weight: 500;
+    font-size: 14px;
+    margin-left: 4px;
+}
+
+.scan-card-actions button.copy-btn {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 6px;
+    margin-left: 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.scan-card-actions button.copy-btn:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.scan-card-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    padding: 0.1px 0.2px; 
+    border-top: 1px solid #f0f0f0; 
+}
+
+.scan-item-tag {
+    background-color: #f5f5f7;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #555;
+    border: 1px solid #e8e8e8;
+    line-height: 1;
+    word-break: break-all;
+}
+
+.scan-card-content.list-style {
+    flex-direction: column;
+    gap: 2px; 
+}
+
+.scan-item-list-item {
+    background-color: #f5f5f7;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #333;
+    border: 1px solid #e8e8e8;
+    line-height: 1;
+    word-break: break-all;
+    width: 100%;
+    box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+    <div class="nav">
+        <button id="nav-scanner">信息收集</button>
+        <button id="nav-requests" class="active">当前请求</button>
+        <button id="nav-scripts">JS列表</button>
+        <button id="nav-history">AI记录</button>
+        <button id="nav-sender">发包器</button>
+        <button id="nav-subdomain">子域名收集</button>
+        <button id="nav-quick-functions">快捷功能</button>
+        <button id="nav-settings">设置</button>
+    </div>
+    <div id="view-requests" class="view active">
+        <button id="clear-requests-btn">清空记录</button>
+        <hr>
+        <div id="requests-container"></div>
+    </div> 
+
+    <div id="view-history" class="view">
+        <button id="clear-history-btn">清空历史</button>
+        <hr>
+        <div id="history-container"></div>
+    </div>
+
+    <div id="view-scripts" class="view">
+    <p4>当前页面加载的所有js</p4>
+    <button id="scan-sourcemaps-btn" style="margin-top: 10px; width: 100%;">扫描js.map是否存在</button>
+    <div id="scan-sourcemaps-status" style="margin-top: 8px; text-align: center; color: #888; height: 1.2em;"></div>
+    <hr>
+    <div id="scripts-container"></div>
+</div>
+
+    <div id="view-sender" class="view">
+        <button id="clear-sender-list-btn">清空列表</button>
+        <button id="send-all-requests-btn" style="background-color: #2e7d32; margin-left: 8px;">一键请求全部</button>
+    <span id="sender-all-status" style="margin-left: 10px; color: #6e6e73;"></span>
+        <input type="search" id="sender-search-input" placeholder="通过URL或Method搜索..." style="margin-left: 10px; padding: 5px; width: 250px;">
+        <hr>
+        <div id="sender-list-container"></div>
+    </div>
+
+    <div id="view-settings" class="view">
+    <p4>AI 模型选择</p4>
+    <select id="ai-model-select" style="width: 100%; padding: 5px;">
+        <option value="gemini">Gemini (Google)</option>
+        <option value="chatgpt">ChatGPT (OpenAI)</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="doubao">豆包 (Doubao)</option>
+    </select>
+    <div class="api-key-container" id="gemini-key-container">
+        <p4>Gemini API 密钥</p4>
+        <input type="password" id="api-key-input-gemini" style="width: 98%; padding: 5px;" placeholder="请输入您的Gemini API Key">
+    </div>
+    <div class="api-key-container" id="chatgpt-key-container" style="display: none;">
+        <h5>ChatGPT API 密钥</h5>
+        <input type="password" id="api-key-input-chatgpt" style="width: 98%; padding: 5px;" placeholder="请输入您的OpenAI API Key (sk-...)">
+    </div>
+    <div class="api-key-container" id="deepseek-key-container" style="display: none;">
+        <h5>DeepSeek API 密钥</h5>
+        <p4>在此处输入您的 DeepSeek API 密钥:</p4>
+        <input type="password" id="api-key-input-deepseek" style="width: 98%; padding: 5px;" placeholder="请输入您的DeepSeek API Key">
+    </div>
+    <div class="api-key-container" id="doubao-key-container" style="display: none;">
+        <h5>豆包 API 密钥</h5>
+        <p4>在此处输入您的豆包 API 密钥:</p4>
+        <input type="password" id="api-key-input-doubao" style="width: 98%; padding: 5px;" placeholder="请输入您的豆包 API Key">
+    </div>
+        <h4>白名单域名</h4>
+        <p4>将忽略以下域名(支持通配符, 如 *.baidu.com)，每行一个:</p4>
+        <textarea id="ignore-list-textarea"></textarea>
+        <h4 style="margin-top: 20px;">自动信息收集</h4>
+        <div style="margin-bottom: 15px;">
+            <input type="checkbox" id="auto-scan-checkbox" style="vertical-align: middle;">
+            <label for="auto-scan-checkbox" style="vertical-align: middle;">开启后，当页面加载完成，自动进行信息收集扫描。</label>
+        </div>
+        <button id="save-settings-btn">保存设置</button>
+        <span id="settings-status" style="margin-left: 10px; color: green;"></span>
+    </div>
+    
+    <div id="view-scanner" class="view">
+        <button id="start-scan-btn" style="width: 100%; padding: 10px; font-size: 15px;">开始扫描当前页面资产</button>
+        <div id="scan-status" style="margin-top: 15px; text-align: center;"></div>
+        <div id="scan-results-container" style="margin-top: 10px;"></div>
+    </div>
+
+    <div id="script-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-btn">&times;</span>
+                <p4 id="modal-title">JS 源代码分析</p4>
+                <div class="ai-buttons" id="ai-buttons-container" style="margin-top: 10px;">
+                    <div id="js-analysis-buttons">
+                        <button data-type="all_apis">分析所有接口及参数</button>
+                        <button data-type="encryption">分析加密逻辑</button>
+                        <button data-type="xss">分析XSS风险</button>
+                        <button data-type="permissions">分析页面权限</button>
+                    </div>
+                    <div id="openapi-analysis-buttons" style="display: none;">
+    <button data-type="openapi_all_apis">从API接口文档中提取所有接口</button>
+    
+    <button id="btn-unauthorized-test" style="background-color: #d93025;">一键测试未授权</button>
+    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <details>
+                        <summary>点击展开/折叠源代码</summary>
+                        <pre><code id="script-content"></code></pre>
+                    </details>
+                </div>
+
+                <div id="custom-ai-query-container" style="margin-top: 15px; display: none;">
+                    <p4>自定义分析</p4>
+                    <p>请在下方输入您想问AI的问题，或粘贴您想让AI特别分析的代码片段：</p>
+                    <textarea id="custom-ai-input" style="width: 98%; height: 100px;"></textarea>
+                    <br>
+                    <button id="send-custom-ai-btn" style="margin-top: 5px;">发送给AI分析</button>
+                </div>
+
+                <div id="ai-result-container" style="display: none;">
+                    <div id="ai-result-header">
+                    <h4 id="ai-result-title">AI 分析结果:</h4>
+                    <div class="header-buttons">
+                            <button class="send-to-sender-btn">发送全部到发包器</button>
+                            <button id="copy-ai-result-btn">复制完整结果</button>
+                        </div>
+                    </div>
+                    <pre id="ai-result"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+ <div id="view-scanner" class="view">
+        </div>
+
+    <div id="view-subdomain" class="view">
+        <h4>目标主域名</h4>
+        <p2>请输入您想收集子域名的主域名，多个用英文逗号 (,) 分隔:</p2>
+        <div style="display: flex; gap: 10px; margin-top: 5px; margin-bottom: 15px;">
+            <input type="text" id="subdomain-targets-input" placeholder="例如: baidu.com,qq.com" style="flex-grow: 1; padding: 5px;">
+            <button id="save-subdomain-targets-btn">保存</button>
+        </div>
+        <span id="subdomain-status" style="margin-left: 10px; color: green;"></span>
+        <hr>
+        <h4>子域名收集记录:</h4>
+        <div id="collected-subdomains-container" style="white-space: pre-wrap; word-break: break-all;"></div>
+    </div>
+    <div id="script-modal" class="modal">
+        </div>
+<div id="view-quick-functions" class="view">
+        <details>
+            <summary style="font-size: 16px; cursor: pointer; color: var(--accent-blue);">
+                批量打开网址 >
+            </summary>
+            <div class="sub-view-content" style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <h4>批量打开网址</h4>
+                <p2>请输入您想打开的网址或域名，每行一个:</p2>
+                <textarea id="batch-open-urls-textarea" style="width: 98%; height: 200px; margin-top: 5px;" placeholder="baidu.com&#10;qq.com&#10;https://163.com"></textarea>
+                <button id="batch-open-urls-btn" style="margin-top: 10px;">批量打开</button>
+                <span id="batch-open-status" style="margin-left: 10px; color: green;"></span>
+            </div>
+        </details>
+        <details style="margin-top: 20px;">
+            <summary style="font-size: 16px; cursor: pointer; color: var(--accent-blue);">
+                一键解锁隐藏元素 >
+            </summary>
+            <div class="sub-view-content" style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px; display: flex; flex-direction: column; gap: 15px;">
+                
+                <div>
+                    <button id="btn-reveal-elements" style="width: 150px;">显示隐藏元素</button>
+                    <p2 style="font-size: 12px; color: #6e6e73; margin-left: 10px;">强制显示被 display:none 等方式隐藏的元素。</p2>
+                </div>
+
+                <div>
+                    <button id="btn-enable-inputs" style="width: 150px;">启用禁用输入项</button>
+                    <p2 style="font-size: 12px; color: #6e6e73; margin-left: 10px;">移除按钮和输入框的 disabled/readonly 状态。</p2>
+                </div>
+
+                <div>
+                    <button id="btn-restore-interactions" style="width: 150px;">解除交互限制</button>
+                    <p2 style="font-size: 12px; color: #6e6e73; margin-left: 10px;">恢复文本选择、复制和鼠标右键菜单。</p2>
+                </div>
+                
+                <div>
+                    <button id="btn-remove-overlays" style="width: 150px;">尝试移除遮罩</button>
+                    <p2 style="font-size: 12px; color: #6e6e73; margin-left: 10px;">尝试移除页面上方的广告或登录弹窗。</p2>
+                </div>
+
+                <span id="enhancement-status" style="color: green; text-align: center; height: 1.2em;"></span>
+            </div>
+        </details>
+        <details style="margin-top: 20px;">
+            <summary style="font-size: 16px; cursor: pointer; color: var(--accent-blue);">
+                批量探测网站标题 >
+            </summary>
+            <div class="sub-view-content" style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <h4>批量探测网站标题和状态</h4>
+                <p>请输入网址、域名或IP:端口，每行一个:</p>
+                <textarea id="batch-title-urls-textarea" style="width: 98%; height: 200px; margin-top: 5px;" placeholder="example.com\nhttp://192.168.1.1:8080\nhttps://google.com"></textarea>
+                <button id="batch-title-fetch-btn" style="margin-top: 10px;">开始探测</button>
+                <button id="batch-title-clear-btn" style="margin-top: 10px; margin-left: 8px; background-color: #6e6e73;">清空记录</button>
+<span id="batch-title-status" style="margin-left: 10px; color: #6e6e73;"></span>
+                <div id="batch-title-results-container" style="margin-top: 15px; max-height: 400px; overflow-y: auto;">
+                    </div>
+            </div>
+        </details>
+        </div>
+    <div id="script-modal" class="modal">
+        </div>
+    <script src="/js/popup.js"></script>
+</body>
+</html>
