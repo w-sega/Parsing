@@ -18,7 +18,7 @@ Parsing 是一个 Chrome 插件，用于解析当前页面的 Js代码，并提�
 
 ## 功能截图
 
-### 接入jsmaphtml
+### 接入jsmap_Inspector
 <div style="text-align:center">
     <img src="png/jsmap.png" alt="jsmap" width="80%">
     <img src="png/jsmapfx.png" alt="jsmapfx" width="80%">
@@ -70,4 +70,4 @@ Parsing 是一个 Chrome 插件，用于解析当前页面的 Js代码，并提�
     <img src="png/sz.png" alt="设置" width="80%">
  </div>
 
-### jsmap.html来自https://github.com/ynsmroztas/jsmap_inspector，接入了ai分析接口
+### jsmap.html来自https://github.com/ynsmroztas/jsmap_inspector 接入了ai分析接口
