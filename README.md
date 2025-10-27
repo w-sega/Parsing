@@ -5,7 +5,7 @@ Parsing 是一个 Chrome 插件，用于解析当前页面的 Js代码，并提�
 ## 功能
 
 1. 非自动形式的js敏感信息扫描。
-2. 截获当前页面的请求，并获取其来源js，以此选择性分析js源码，存在swagger类的接口文档，可单独分析。若存在jsmap，则可用jsmaphtml进行分析，亦可使用ai。
+2. 截获当前页面的请求，并获取其来源js，以此选择性分析js源码，存在swagger类的接口文档，可单独分析。若存在jsmap，则可用jsmap_Inspector进行分析，亦可使用ai。
 3. 提供多种分析方式的快捷按钮，支持自定义提示词内容，多种ai模型的分析。
 4. ai分析提取到的接口和参数，支持一键发送到发包器，发包器可更改参数，使用当前cookie一键发包。
 5. 快捷功能提供批量打开网站，一键解锁页面隐藏，批量探测网站标题。
@@ -69,3 +69,5 @@ Parsing 是一个 Chrome 插件，用于解析当前页面的 Js代码，并提�
 <div style="text-align:center">
     <img src="png/sz.png" alt="设置" width="80%">
  </div>
+
+### jsmap.html来自https://github.com/ynsmroztas/jsmap_inspector，接入了ai分析接口
