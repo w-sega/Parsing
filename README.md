@@ -17,6 +17,11 @@ Parsing 是一个 Chrome 插件，用于解析当前页面的 JavaScript 代码�
 
 ## 功能截图
 
+### 接入jsmaphtml
+<div style="text-align:center">
+    <img src="png/jsmap.png" alt="jsmap" width="80%">
+    <img src="png/jsmapfx.png" alt="jsmapfx" width="80%">
+    </div>
 
 ### 当前请求
 <div style="text-align:center">
@@ -51,12 +56,12 @@ Parsing 是一个 Chrome 插件，用于解析当前页面的 JavaScript 代码�
 
 ### 子域名收集
 <div style="text-align:center">
-    <img src="png/aijl.png" alt="子域名收集" width="80%">
+    <img src="png/zymsj.png" alt="子域名收集" width="80%">
 </div>
 
 ### 快捷功能
 <div style="text-align:center">
-    <img src="png/aijl.png" alt="快捷功能" width="80%">
+    <img src="png/kjgn.png" alt="快捷功能" width="80%">
 </div>
 
 ### 设置
