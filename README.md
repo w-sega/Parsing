@@ -1,6 +1,7 @@
 # Parsing
 
-Parsing 是一个 Chrome 插件，选择ai分析当前页面的Js代码，内置提示词，不再需要单拎js。以及信息收集功能，提升渗透测试效率
+Parsing 是一个 Chrome 插件，选择ai分析当前页面的Js代码，内置提示词，不再需要单拎js。以及信息收集功能，提升渗透测试效率。  
+
 此插件不再更新，现阶段ai分析长文js提取接口和参数仍比较耗时耗token，效率不高，更高效率建议使用burp插件https://github.com/w-sega/Burp_URLReplayer
 
 ## 功能
